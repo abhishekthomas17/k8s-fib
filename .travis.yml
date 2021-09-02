@@ -12,7 +12,7 @@ after_success:
     - docker build --no-cache -t abhitom17/docker-fib/server ./server
     - docker build --no-cache -t abhitom17/docker-fib/worker ./worker
     - docker build --no-cache -t abhitom17/docker-fib/nginx ./nginx
-    - echo "DOCKER_PASSWORD" | docker login -u "DOCKER_USERNAME" --password-stdin
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push abhitom17/docker-fib/client
     - docker push abhitom17/docker-fib/server
     - docker push abhitom17/docker-fib/worker
