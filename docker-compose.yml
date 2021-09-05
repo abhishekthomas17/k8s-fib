@@ -1,54 +1,31 @@
 version: "3"
-services: 
-    postgres:
-        image: postgres
-        environment:
-            - POSTGRES_PASSWORD=postgres_password
-    redis:
-        image: redis
-    nginx:
-        restart: always
-        build: 
-            context: ./nginx
-            dockerfile: Dockerfile.dev
-        ports: 
-            - 80:80
-        depends_on:
-            - api
-            - client
-    api:
-        build: 
-            context: ./server
-            dockerfile: Dockerfile.dev
-        volumes: 
-            - /app/node_modules
-            - ./server:/app
-        environment:
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
-            - PGUSER=postgres
-            - PGHOST=postgres
-            - PGDATABASE=postgres
-            - PGPASSWORD=postgres_password
-            - PGPORT=5432
+services:
     client:
-        # Error occurs in react-scripts 16
-        stdin_open: true
-        build: 
-            dockerfile: Dockerfile.dev
-            context: ./client
-        volumes:
-            - /app/node_modules
-            - ./client:/app
+        image: "abhitom17/docker-fib-client"
+        mem_limit: 128m
+        hostname: client
+    server:
+        image: "abhitom17/docker-fib-server"
+        mem_limit: 128m
+        hostname: api
         environment:
-            - CHOKIDAR_USEPOLLING=true
+            - REDIS_HOST=$REDIS_HOST
+            - REDIS_PORT=$REDIS_PORT
+            - PGUSER=$PGUSER
+            - PGHOST=$PGHOST
+            - PGDATABASE=$PGDATABASE
+            - PGPASSWORD=$PGPASSWORD
+            - PGPORT=$PGPORT
     worker:
-        build:
-            dockerfile: Dockerfile.dev
-            context: ./worker
-        volumes:
-            - /app/node_modules
-            - ./worker:/app
+        image: "abhitom17/docker-fib-worker"
+        mem_limit: 128m
+        hostname: worker
         environment:
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
+            - REDIS_HOST=$REDIS_HOST
+            - REDIS_PORT=$REDIS_PORT
+    nginx:
+        image: "abhitom17/docker-fib-nginx"
+        mem_limit: 128m
+        hostname: nginx
+        ports:
+            - "80:80"
